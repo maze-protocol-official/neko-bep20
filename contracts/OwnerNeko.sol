@@ -183,7 +183,7 @@ contract OwnerNeko {
         uint length = owners.length;
         if (length > 0) {
             for (uint256 x = 0; x < length; x++) {
-                require(owners[x] == owner, "Already existed");
+                require(owners[x] != owner, "Already existed");
             }
         }
     }
