@@ -1,0 +1,39 @@
+{
+  "name": "neko-bep20",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maze-finance-protocol/maze-protocol.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maze-finance-protocol/maze-protocol/issues"
+  },
+  "homepage": "https://github.com/maze-finance-protocol/maze-protocol/blob/main/README.md",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "4.0.0-rc.0",
+    "hardhat": "npm:@salaku/hardhat",
+    "hardhat-deploy": "^0.7.0-beta.50",
+    "live-server": "^1.2.1",
+    "mocha": "^6.2.2",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.0",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
+  },
+  "scripts": {
+    "compile": "hardhat compile",
+    "clean": "rimraf ./artifacts && rimraf ./cache"
+  },
+  "dependencies": {
+    "@salaku/hardhat": "^2.1.1",
+    "@types/node": "^15.0.0"
+  }
+}
