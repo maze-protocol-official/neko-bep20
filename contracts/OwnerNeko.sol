@@ -133,7 +133,7 @@ contract OwnerNeko {
         bytes32 r, 
         bytes32 s
     ) external CheckAddress(owner) CheckState(uint(Type.AddOwner)) {
-        require(!checkPermitOwners(owner), "Already existed");
+        require(!checkPermitOwners(spender), "Already existed");
         
         bool result = permit(uint(Type.AddOwner), owner, spender, value, deadline, v, r, s);
         if (result) {
