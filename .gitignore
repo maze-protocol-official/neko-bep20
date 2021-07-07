@@ -8,3 +8,4 @@ artifacts
 cache
 yarn.lock
 target
+yarn-error.log
