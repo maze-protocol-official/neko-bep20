@@ -11,8 +11,8 @@ contract OwnerNeko {
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
     string public constant name = 'Neko Mint';
-    uint32 public constant LOCK_PERIOD =  10 minutes;//48 hours;
-    uint32 public constant PERIOD = 15 minutes;//72 hours;
+    uint32 public constant LOCK_PERIOD =  48 hours;
+    uint32 public constant PERIOD = 72 hours;
     uint256 public constant MAX_MINT_COUNT = 504000 * 10 ** 18;
     
     bytes32 public DOMAIN_SEPARATOR;
@@ -280,6 +280,7 @@ contract OwnerNeko {
         if (result) {
             data.blockTimestampLockLast = block.timestamp;
             data.state = uint(Type.Empty);
+            delete  data.sigOwners;
             
             emit LockMint(value);
         }
