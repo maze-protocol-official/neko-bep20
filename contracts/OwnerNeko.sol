@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import { NEKOToken } from './NEKOToken.sol';
-import { SafeMath } from '../../dependencies/openzeppelin/contracts/SafeMath.sol';
+import { SafeMath } from './SafeMath.sol';
 
 contract OwnerNeko {
     

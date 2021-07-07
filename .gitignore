@@ -7,7 +7,4 @@ out
 artifacts
 cache
 yarn.lock
-local
-deployments
-layer2-rs/target
 target
