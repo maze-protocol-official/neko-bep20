@@ -1,4 +1,4 @@
-# Neko BEP20
+# NEKO Token BEP-20 Contract
 
 ## compile
 
