@@ -310,6 +310,7 @@ contract OwnerNeko {
         bytes32 r,
         bytes32 s
     ) external CheckAddress(spender) CheckState(uint(Type.UnLockMint)) {
+        require(budgetMint > 0, "Abnormal amount");
         uint block_time = block.timestamp;
         uint256 timeElapsed = block_time - blockTimestampLockLast;
         require(timeElapsed >= LOCK_PERIOD, "No satisfaction time");
