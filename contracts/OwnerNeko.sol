@@ -11,7 +11,7 @@ contract OwnerNeko {
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
     string public constant name = 'Neko Mint';
-    uint32 public constant LOCK_PERIOD =  48 hours;
+    uint32 public constant LOCK_PERIOD = 48 hours;
     uint32 public constant PERIOD = 72 hours;
     uint256 public constant MAX_MINT_COUNT = 504000 * 10 ** 18;
 
@@ -23,6 +23,10 @@ contract OwnerNeko {
 
     uint public blockTimestampLast;
 
+    uint256 public budgetMint;
+
+    uint public blockTimestampLockLast;
+
     NEKOToken public neko;
 
     Data public data;
@@ -33,8 +37,6 @@ contract OwnerNeko {
 
     struct Data {
         address[] sigOwners;
-        uint256 budgetMint;
-        uint blockTimestampLockLast;
         address spender;
         uint256 state;
     }
@@ -45,7 +47,7 @@ contract OwnerNeko {
 
     event LockMint(uint256 amount);
 
-    event UnLockMint(address spender, uint256 amount);
+    event UnLockMint(address spender);
 
     event ChangeOwner(address owner);
 
@@ -57,7 +59,7 @@ contract OwnerNeko {
     }
 
     modifier CheckPrestrain() {
-        require(data.blockTimestampLockLast == 0 || data.budgetMint == 0, "Prestrain cannot be repeated");
+        require(blockTimestampLockLast == 0 || budgetMint == 0, "Prestrain cannot be repeated");
         _;
     }
 
@@ -103,14 +105,14 @@ contract OwnerNeko {
     returns
     (
         address[] memory sigOwners,
-        uint256 budgetMint,
-        uint blockTimestampLockLast,
+        uint256 budgetmint,
+        uint blockTimestamplockLast,
         address spender,
         uint256 state
     ) {
         sigOwners = data.sigOwners;
-        budgetMint = data.budgetMint;
-        blockTimestampLockLast = data.blockTimestampLockLast;
+        budgetmint = budgetMint;
+        blockTimestamplockLast = blockTimestampLockLast;
         spender = data.spender;
         state = data.state;
     }
@@ -248,10 +250,10 @@ contract OwnerNeko {
                 data.sigOwners.push(owner);
                 sigcount = data.sigOwners.length;
                 if (sigcount == 1) {
-                    data.budgetMint = value;
+                    budgetMint = value;
                     data.state = state;
                 } else {
-                    require(data.budgetMint == value, "Check abnormal");
+                    require(budgetMint == value, "Check abnormal");
                 }
             } else if (state == uint(Type.Recall)) {
                 recallOwner(owner);
@@ -290,10 +292,9 @@ contract OwnerNeko {
 
         bool result = permit(uint(Type.LockMint), owner, spender, value, deadline, v, r, s);
         if (result) {
-            data.blockTimestampLockLast = block.timestamp;
-            data.state = uint(Type.Empty);
+            blockTimestampLockLast = block.timestamp;
 
-            delete  data.sigOwners;
+            delete data;
             emit LockMint(value);
         }
 
@@ -310,18 +311,20 @@ contract OwnerNeko {
         bytes32 s
     ) external CheckAddress(spender) CheckState(uint(Type.UnLockMint)) {
         uint block_time = block.timestamp;
-        uint256 timeElapsed = block_time - data.blockTimestampLockLast;
+        uint256 timeElapsed = block_time - blockTimestampLockLast;
         require(timeElapsed >= LOCK_PERIOD, "No satisfaction time");
 
         bool result = permit(uint(Type.UnLockMint), owner, spender, value, deadline, v, r, s);
         if (result) {
-            neko.mint(data.spender, data.budgetMint);
+            neko.mint(data.spender, budgetMint);
 
             delete data;
 
             blockTimestampLast = block_time;
+            budgetMint = 0;
+            blockTimestampLockLast = 0;
 
-            emit UnLockMint(data.spender, data.budgetMint);
+            emit UnLockMint(data.spender);
         }
     }
 
@@ -335,6 +338,7 @@ contract OwnerNeko {
         bytes32 r,
         bytes32 s
     ) external CheckAddress(owner) CheckState(uint(Type.ChangeOwner)) {
+        require(address(this) != spender, "Invalid owner");
 
         bool result = permit(uint(Type.ChangeOwner), owner, spender, value, deadline, v, r, s);
         if (result) {
@@ -367,4 +371,5 @@ contract OwnerNeko {
             emit Recall(owner, state);
         }
     }
+
 }
