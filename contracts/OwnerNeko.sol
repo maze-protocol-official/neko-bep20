@@ -158,6 +158,7 @@ contract OwnerNeko {
         bytes32 s
     ) external CheckState(uint(Type.RemoveOwner)) {
         require(ownerCount > 1, "Not least one");
+        require(checkPermitOwners(spender), "Invalid owner");
 
         bool result = permit(uint(Type.RemoveOwner), owner, spender, value, deadline, v, r, s);
         if (result) {
