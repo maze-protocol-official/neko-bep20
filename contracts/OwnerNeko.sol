@@ -2,11 +2,8 @@
 pragma solidity ^0.8.0;
 
 import { NEKOToken } from './NEKOToken.sol';
-import { SafeMath } from './SafeMath.sol';
 
 contract OwnerNeko {
-
-    using SafeMath for uint256;
 
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
@@ -73,7 +70,7 @@ contract OwnerNeko {
         address _neko,
         address[] memory _owners
     ) {
-
+        require(_neko != address(0), "Invalid neko address");
         neko = NEKOToken(_neko);
 
         ownerCount = _owners.length;
@@ -121,7 +118,7 @@ contract OwnerNeko {
         if (ownerCount == 1) {
             ownerRight = 1;
         } else {
-            ownerRight = ownerCount.mul(2).div(3);
+            unchecked { ownerRight = ownerCount*2/3; }
         }
     }
 
@@ -267,7 +264,7 @@ contract OwnerNeko {
                     require(data.spender == spender, "Check abnormal");
                 }
             }
-            ownerNonce[owner] = ownerNonce[owner].add(1);
+            ownerNonce[owner] = ownerNonce[owner]+1;
             if (sigcount >= ownerRight) {
                 return true;
             }
