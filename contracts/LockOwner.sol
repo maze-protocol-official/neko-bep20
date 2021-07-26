@@ -5,7 +5,7 @@ import { NEKOToken } from './NEKOToken.sol';
 
 contract LockOwner {
     
-    uint32 public constant LOCK_PERIOD = 5 minutes;//24 hours;
+    uint32 public constant LOCK_PERIOD = 24 hours;
     
     uint public blockTimestampLast;
     
