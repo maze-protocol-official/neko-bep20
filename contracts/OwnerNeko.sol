@@ -346,11 +346,10 @@ contract OwnerNeko {
 
         bool result = permit(uint(Type.ChangeOwner), owner, spender, value, deadline, v, r, s);
         if (result) {
+            lockowner.setLockTime();
             neko.transferOwnership(spender);
 
             delete data;
-            
-            lockowner.setLockTime();
 
             emit ChangeOwner(spender);
         }
