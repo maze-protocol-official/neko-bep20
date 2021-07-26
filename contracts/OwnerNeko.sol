@@ -363,6 +363,10 @@ contract OwnerNeko {
         permit(uint(Type.Recall), owner, spender, value, deadline, v, r, s);
 
         if (data.sigOwners.length == 0) {
+            
+            if (data.state == uint(Type.LockMint)) {
+                budgetMint = 0;
+            }
 
             delete data;
 
