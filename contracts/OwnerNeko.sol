@@ -2,14 +2,15 @@
 pragma solidity ^0.8.0;
 
 import { NEKOToken } from './NEKOToken.sol';
+import { LockOwner } from './LockOwner.sol';
 
 contract OwnerNeko {
 
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
     string public constant name = 'Neko Mint';
-    uint32 public constant LOCK_PERIOD = 48 hours;
-    uint32 public constant PERIOD = 72 hours;
+    uint32 public constant LOCK_PERIOD = 2 minutes;//48 hours;
+    uint32 public constant PERIOD = 5 minutes;//72 hours;
     uint256 public constant MAX_MINT_COUNT = 504000 * 10 ** 18;
 
     bytes32 public DOMAIN_SEPARATOR;
@@ -27,6 +28,8 @@ contract OwnerNeko {
     NEKOToken public neko;
 
     Data public data;
+    
+    LockOwner public lockowner;
 
     mapping(address => uint256) public ownerNonce;
 
@@ -68,10 +71,12 @@ contract OwnerNeko {
     constructor
     (
         address _neko,
+        address _lockowner,
         address[] memory _owners
     ) {
-        require(_neko != address(0), "Invalid neko address");
+        require(_neko != address(0) && _lockowner != address(0), "Invalid address");
         neko = NEKOToken(_neko);
+        lockowner = LockOwner(_lockowner);
 
         ownerCount = _owners.length;
         require(ownerCount > 0, "Owners exception");
@@ -337,12 +342,15 @@ contract OwnerNeko {
         bytes32 s
     ) external CheckAddress(owner) CheckState(uint(Type.ChangeOwner)) {
         require(address(this) != spender, "Invalid owner");
+        require(lockowner.checkLock(), "No satisfaction time");
 
         bool result = permit(uint(Type.ChangeOwner), owner, spender, value, deadline, v, r, s);
         if (result) {
             neko.transferOwnership(spender);
 
             delete data;
+            
+            lockowner.setLockTime();
 
             emit ChangeOwner(spender);
         }
